@@ -31,5 +31,5 @@ def classify_image(image_path):
         print(f"Error processing image: {e}")
 
 if __name__ == "__main__":
-    image_path = "basic_cat.jpg"  
+    image_path = "basic_murphy.jpg"  
     classify_image(image_path)

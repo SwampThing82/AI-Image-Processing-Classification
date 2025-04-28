@@ -16,5 +16,5 @@ def apply_blur_filter(image_path):
         print(f"Error processing image: {e}")
 
 if __name__ == "__main__":
-    image_path = "basic_cat.jpg"  # Replace with the path to your image file
+    image_path = "basic_murphy.jpg"  # Replace with the path to your image file
     apply_blur_filter(image_path)
