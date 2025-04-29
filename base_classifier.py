@@ -78,25 +78,25 @@ def classify_image(image_path):
         for i, (imagenet_id, label, score) in enumerate(decoded_predictions):
             print(f"{i + 1}: {label} ({score:.2f})")
 
-                     # Grad-CAM heatmap
+     # Grad-CAM heatmap
         last_conv_layer_name = "Conv_1"
         heatmap = make_gradcam_heatmap(img_array, model, last_conv_layer_name)
 
-        # Load original image
+    # Load original image
         img = image.load_img(image_path)
         img = image.img_to_array(img)
 
-        # Resize heatmap to match image size
+    # Resize heatmap to match image size
         heatmap = cv2.resize(heatmap, (img.shape[1], img.shape[0]))
 
-        # Convert heatmap to RGB
+    # Convert heatmap to RGB
         heatmap = np.uint8(255 * heatmap)
 
-        # Apply heatmap onto original image
+    # Apply heatmap onto original image
         heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
         superimposed_img = heatmap * 0.4 + img
 
-        # Plot the result
+    # Plot the result
         plt.figure(figsize=(10, 5))
 
         plt.subplot(1, 2, 1)
@@ -136,6 +136,26 @@ def classify_image(image_path):
         cv2.imwrite("noise_patch_occlusion.jpg", cv2.cvtColor(img_noisy, cv2.COLOR_RGB2BGR))
 
         print("Saved three occluded images: black_box_occlusion.jpg, blurred_occlusion.jpg, noise_patch_occlusion.jpg")
+
+        # --- Now classify each occluded image ---
+        occluded_images = {
+            "Black Box": img_black_box,
+            "Blurred": img_blurred,
+            "Noisy": img_noisy,
+        }
+
+        for occlusion_type, occluded_img in occluded_images.items():
+            # Preprocess occluded image
+            occluded_img_array = preprocess_input(occluded_img)
+            occluded_img_array = np.expand_dims(occluded_img_array, axis=0)
+
+            # Make prediction
+            occluded_predictions = model.predict(occluded_img_array)
+            decoded_occluded_predictions = decode_predictions(occluded_predictions, top=3)[0]
+
+            print(f"\nTop-3 Predictions for {occlusion_type} Occlusion:")
+            for i, (imagenet_id, label, score) in enumerate(decoded_occluded_predictions):
+                print(f"{i + 1}: {label} ({score:.2f})")
 
     except Exception as e:
         print(f"Error processing image: {e}")
